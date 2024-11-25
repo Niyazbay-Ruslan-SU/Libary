@@ -1,0 +1,124 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Library
+{
+    public class Book
+    {
+        public string Title { get; set; }
+        public string Author { get; set; }
+        public string ISBN { get; set; }
+        public bool IsAvailable { get; private set; } = true;
+
+        public void MarkAsLoaned()
+        {
+            IsAvailable = false;
+            Console.WriteLine($"Книга \"{Title}\" выдана.");
+        }
+
+        public void MarkAsAvailable()
+        {
+            IsAvailable = true;
+            Console.WriteLine($"Книга \"{Title}\" доступна.");
+        }
+    }
+    public class Reader
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Email { get; set; }
+
+        public void BorrowBook(Book book)
+        {
+            if (book.IsAvailable)
+            {
+                book.MarkAsLoaned();
+                Console.WriteLine($"{Name} взял(а) книгу \"{book.Title}\".");
+            }
+            else
+            {
+                Console.WriteLine($"Книга \"{book.Title}\" уже занята.");
+            }
+        }
+
+        public void ReturnBook(Book book)
+        {
+            book.MarkAsAvailable();
+            Console.WriteLine($"{Name} вернул(а) книгу \"{book.Title}\".");
+        }
+    }
+    public class Librarian
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Position { get; set; }
+
+        private List<Book> libraryBooks = new List<Book>();
+
+        public void AddBook(Book book)
+        {
+            libraryBooks.Add(book);
+            Console.WriteLine($"Книга \"{book.Title}\" добавлена в библиотеку.");
+        }
+
+        public void RemoveBook(Book book)
+        {
+            libraryBooks.Remove(book);
+            Console.WriteLine($"Книга \"{book.Title}\" удалена из библиотеки.");
+        }
+    }
+    public class Loan
+    {
+        public Book Book { get; private set; }
+        public Reader Reader { get; private set; }
+        public DateTime LoanDate { get; private set; }
+        public DateTime? ReturnDate { get; private set; }
+
+        public Loan(Book book, Reader reader)
+        {
+            Book = book;
+            Reader = reader;
+            LoanDate = DateTime.Now;
+        }
+
+        public void IssueLoan()
+        {
+            Console.WriteLine($"Книга \"{Book.Title}\" выдана {Reader.Name}.");
+        }
+
+        public void CompleteLoan()
+        {
+            ReturnDate = DateTime.Now;
+            Book.MarkAsAvailable();
+            Console.WriteLine($"Книга \"{Book.Title}\" возвращена {Reader.Name}.");
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.OutputEncoding = Encoding.UTF8;
+            Librarian librarian = new Librarian { Id = 1, Name = "Герцен", Position = "Старший библиотекарь" };
+
+            Book book1 = new Book { Title = "Қара сөздер", Author = "Абай Құнанбай", ISBN = "12345" };
+            Book book2 = new Book { Title = "Абай жолы", Author = "Мұхтар Әуезов", ISBN = "67890" };
+
+            librarian.AddBook(book1);
+            librarian.AddBook(book2);
+
+            Reader reader = new Reader { Id = 101, Name = "Ниязбай Руслан", Email = "niyazbay.2004@mail.com" };
+
+            reader.BorrowBook(book1);
+
+            Loan loan = new Loan(book1, reader);
+            loan.IssueLoan();
+
+            loan.CompleteLoan();
+        }
+    }
+
+}
